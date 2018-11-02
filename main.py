@@ -31,17 +31,32 @@ def colliderect( obj, mouse, objrender):
 
 def paoselect():
     global paoselected
-    paoselected = "paofrances"
-
+    paoselected = ["paofrances", "baguete", "croissant", "paodeforma", "paoretro", "torrada"]
+    select = 0
     arial = pygame.font.SysFont("Arial", 64, True, False)
-    pao = {"texto": "Pao", "x": 300, "y": 50, "cor": (0, 0, 0),"correct": (255, 255, 0) ,"mcolide": False}
-    baguete = {"texto": "Baguete", "x": 500, "y": 50, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
+    rectalpha = pygame.Surface((90, 90))
+    rectalpha.set_alpha(160)
+    esquerda = {"texto": "<", "x": 200, "y": 300, "cor": (0, 0, 0),"correct": (255, 255, 0) ,"mcolide": False}
+    direita = {"texto": ">", "x": 600, "y": 300, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
     voltar = {"texto": "Voltar", "x": 0, "y": 420, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
     run = True
     while run:
         scr.fill((0, 0, 0))
-        paofundo = pygame.image.load("assets/" + paoselected + "/pao.png").convert_alpha()
+        paofundo = pygame.image.load("assets/" + paoselected[select] + "/pao.png").convert_alpha()
         paofundoscaled = pygame.transform.scale(paofundo, (60, 120))
+
+        if select + 1 >= len(paoselected):
+            paofundodireita = pygame.image.load("assets/" + paoselected[len(paoselected) - select] + "/pao.png")
+        else:
+            paofundodireita = pygame.image.load("assets/" + paoselected[select + 1] + "/pao.png")
+
+        if select - 1 < 0:
+            paofundoesquerda = pygame.image.load("assets/" + paoselected[len(paoselected) - 1] + "/pao.png")
+        else:
+            paofundoesquerda = pygame.image.load("assets/" + paoselected[select - 1] + "/pao.png")
+
+        paofundodireita_scaled = pygame.transform.scale(paofundodireita, (40, 80))
+        paofundoesquerda_scaled = pygame.transform.scale(paofundoesquerda, (40, 80))
 
         for e in pygame.event.get():
             if e.type == QUIT:
@@ -51,30 +66,37 @@ def paoselect():
                     exit()
             elif e.type == MOUSEBUTTONDOWN:
                 if e.button == 1:
-                    if pao["mcolide"] == True:
-                        paoselected = "paofrances"
-                    elif baguete["mcolide"] == True:
-                        paoselected = "baguete"
+                    if esquerda ["mcolide"] == True:
+                        select -= 1
+                        if select < 0:
+                            select = len(paoselected) - 1
+                    elif direita["mcolide"] == True:
+                        select += 1
+                        if select >= len(paoselected):
+                            select = 0
                     elif voltar["mcolide"] == True:
                         run = False
+
         mouse = pygame.mouse.get_pos()
 
-        scr.blit(paofundoscaled, (350, 300))
+        scr.blit(paofundoesquerda_scaled, (350, 300))
+        scr.blit(rectalpha, (350, 300))
         scr.blit(paofundoscaled, (400, 300))
-        scr.blit(paofundoscaled, (450, 300))
+        scr.blit(paofundodireita_scaled, (450, 300))
+        scr.blit(rectalpha, (450, 300))
         #selected = arial.render("Selecionado: " + paoselected, True, (255, 255, 0))
         #scr.blit(selected, (200, 300))
-        paorender = arial.render(pao["texto"], True, pao["cor"], pao["correct"])
+        direitarender = arial.render(direita["texto"], True, direita["cor"], direita["correct"])
         voltarrender = arial.render(voltar["texto"], True, voltar["cor"], voltar["correct"])
-        bagueterender = arial.render(baguete["texto"], True, baguete["cor"], baguete["correct"])
+        esquerdarender = arial.render(esquerda["texto"], True, esquerda["cor"], esquerda["correct"])
 
-        scr.blit(paorender, (pao["x"], pao["y"]))
+        scr.blit(direitarender, (direita["x"], direita["y"]))
         scr.blit(voltarrender, (voltar["x"], voltar["y"]))
-        scr.blit(bagueterender, (baguete["x"], baguete["y"]))
+        scr.blit(esquerdarender, (esquerda["x"], esquerda["y"]))
 
-        colliderect(pao, mouse, paorender)
+        colliderect(direita, mouse, direitarender)
         colliderect(voltar, mouse, voltarrender)
-        colliderect(baguete, mouse, bagueterender)
+        colliderect(esquerda, mouse, esquerdarender)
 
 
 
@@ -86,10 +108,6 @@ def gameintro():
     arial = pygame.font.SysFont("Arial", 64, True, False)
     start = {"texto": "Start Game", "x": 200, "y": 100, "cor":(0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
     pao = {"texto": "Choose Pao", "x": 200, "y": 300, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
-    startrender = arial.render(start["texto"], True, start["cor"])
-    paorender = arial.render(pao["texto"], True, pao["cor"])
-    startrect = startrender.get_rect()
-    paorect = paorender.get_rect()
     intro = True
     while intro:
         scr.fill((0, 0, 0))
@@ -109,25 +127,17 @@ def gameintro():
                         cenario = cls.Cenario(scr, paoselected)
                     elif pao["mcolide"] == True:
                         paoselect()
+
         mouse = pygame.mouse.get_pos()
 
-        pygame.draw.rect(scr, start["correct"], [start["x"], start["y"],startrect.w, startrect.h], 0)
-        pygame.draw.rect(scr, pao["correct"], [pao["x"], pao["y"], paorect.w, paorect.h], 0)
+        startrender = arial.render(start["texto"], True, start["cor"], start["correct"])
+        paorender = arial.render(pao["texto"], True, pao["cor"], pao["correct"])
+
         scr.blit(startrender, (start["x"], start["y"]))
         scr.blit(paorender, (pao["x"], pao["y"]))
 
-        if start["x"] + startrect.w > mouse[0] > start["x"] and start["y"] + startrect.h > mouse[1] > start["y"]:
-            start["correct"] = (255, 255, 255)
-            start["mcolide"] = True
-        else:
-            start["correct"] = (255, 255, 0)
-            start["mcolide"] = False
-        if pao["x"] + paorect.w > mouse[0] > pao["x"] and pao["y"] + paorect.h > mouse[1] > pao["y"]:
-            pao["correct"] = (255, 255, 255)
-            pao["mcolide"] = True
-        else:
-            pao["correct"] = (255, 255, 0)
-            pao["mcolide"] = False
+        colliderect(start, mouse, startrender)
+        colliderect(pao, mouse, paorender)
 
         clock.tick(60)
         pygame.display.update()
