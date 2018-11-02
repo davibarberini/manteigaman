@@ -4,7 +4,10 @@ from random import randint
 class Cenario(object):
     def __init__(self, scr, paoselected):
         self.paoselected = paoselected
-        self.p1 = Player(scr, (0,255,0), [150, 240, 25, 50], 5, self.paoselected)
+        if paoselected == "croissant":
+            self.p1 = Player(scr, (0,255,0), [150, 240, 50, 25], 5, self.paoselected)
+        else:
+            self.p1 = Player(scr, (0, 255, 0), [150, 240, 25, 50], 5, self.paoselected)
         self.scr = scr
         self.font = pygame.font.SysFont("assets/Vineta", 25, True, False)
         self.image = pygame.image.load("assets/boca.png").convert_alpha()
@@ -35,7 +38,7 @@ class Cenario(object):
             plataforma_Rect = pygame.Rect(plataforma.rect)
             p1_Rect = pygame.Rect(self.p1.rect)
             if pygame.Rect.colliderect(p1_Rect, plataforma_Rect):
-                self.p1.rect[0] = plataforma_Rect.left - 25
+                self.p1.rect[0] = plataforma_Rect.left - self.p1.rect[2]
 
         self.scr.blit(self.image, (-20, 0))
 
@@ -88,7 +91,7 @@ class Cenario(object):
         elif self.weather > 2500:
             self.velw = -1
 
-        if self.p1.rect[0] + self.p1.velx > 500:
+        if self.p1.rect[0] + self.p1.velx > 525 - self.p1.rect[2]:
             self.p1.velx = 0
         if self.p1.rect[0] + self.p1.velx < 0:
             self.p1.alive = False
@@ -98,7 +101,7 @@ class Cenario(object):
             self.image = pygame.image.load("assets/bocafechada1.png").convert_alpha()
             self.image = pygame.image.load("assets/bocafechada.png").convert_alpha()
 
-        if self.p1.rect[1] + self.p1.vely > 413:
+        if self.p1.rect[1] + self.p1.vely > 463 - self.p1.rect[3]:
             self.p1.pulo = 0
             self.p1.vely = 0
             if self.p1.estado == 3:

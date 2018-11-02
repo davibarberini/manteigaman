@@ -17,32 +17,33 @@ jumpSound = pygame.mixer.Sound("assets/jumping.wav")
 music = pygame.mixer.music.load("assets/music.mp3")
 pygame.mixer.music.play(-1)
 
-paoselected = "paofrances"
-cenario = cls.Cenario(scr, paoselected)
+paoselected = ["paofrances", "baguete", "croissant", "paodeforma", "paoretro", "torrada"]
+select = 0
+cenario = cls.Cenario(scr, paoselected[select])
 
 def colliderect( obj, mouse, objrender):
     objrect = objrender.get_rect()
     if obj["x"] + objrect.w > mouse[0] > obj["x"] and obj["y"] + objrect.h > mouse[1] > obj["y"]:
-        obj["correct"] = (255, 255, 255)
+        obj["correct"] = (0, 0, 0)
         obj["mcolide"] = True
     else:
         obj["correct"] = (255, 255, 0)
         obj["mcolide"] = False
 
 def paoselect():
-    global paoselected
+    global paoselected, select
     paoselected = ["paofrances", "baguete", "croissant", "paodeforma", "paoretro", "torrada"]
-    select = 0
     arial = pygame.font.SysFont("Arial", 64, True, False)
     rectalpha = pygame.Surface((90, 90))
     rectalpha.set_alpha(160)
-    esquerda = {"texto": "<", "x": 200, "y": 300, "cor": (0, 0, 0),"correct": (255, 255, 0) ,"mcolide": False}
-    direita = {"texto": ">", "x": 600, "y": 300, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
-    voltar = {"texto": "Voltar", "x": 0, "y": 420, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
+    rectalpha.fill((255, 255, 255))
+    esquerda = {"texto": "<", "x": 200, "y": 300, "cor": (255, 255, 255),"correct": (255, 255, 0) ,"mcolide": False}
+    direita = {"texto": ">", "x": 600, "y": 300, "cor": (255, 255, 255), "correct": (255, 255, 0), "mcolide": False}
+    voltar = {"texto": "Voltar", "x": 0, "y": 420, "cor": (255, 255, 255), "correct": (255, 255, 0), "mcolide": False}
     run = True
     while run:
-        scr.fill((0, 0, 0))
-        paofundo = pygame.image.load("assets/" + paoselected[select] + "/pao.png").convert_alpha()
+        scr.fill((255, 255, 255))
+        paofundo = pygame.image.load("assets/" + paoselected[select] + "/pao_surprise.png").convert_alpha()
         paofundoscaled = pygame.transform.scale(paofundo, (60, 120))
 
         if select + 1 >= len(paoselected):
@@ -81,9 +82,9 @@ def paoselect():
 
         scr.blit(paofundoesquerda_scaled, (350, 300))
         scr.blit(rectalpha, (350, 300))
+        scr.blit(paofundodireita_scaled, (475, 300))
+        scr.blit(rectalpha, (475, 300))
         scr.blit(paofundoscaled, (400, 300))
-        scr.blit(paofundodireita_scaled, (450, 300))
-        scr.blit(rectalpha, (450, 300))
         #selected = arial.render("Selecionado: " + paoselected, True, (255, 255, 0))
         #scr.blit(selected, (200, 300))
         direitarender = arial.render(direita["texto"], True, direita["cor"], direita["correct"])
@@ -106,11 +107,11 @@ def paoselect():
 def gameintro():
     global cenario
     arial = pygame.font.SysFont("Arial", 64, True, False)
-    start = {"texto": "Start Game", "x": 200, "y": 100, "cor":(0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
-    pao = {"texto": "Choose Pao", "x": 200, "y": 300, "cor": (0, 0, 0), "correct": (255, 255, 0), "mcolide": False}
+    start = {"texto": "Start Game", "x": 200, "y": 100, "cor":(255, 255, 255), "correct": (255, 255, 0), "mcolide": False}
+    pao = {"texto": "Choose Pao", "x": 200, "y": 300, "cor": (255, 255, 255), "correct": (255, 255, 0), "mcolide": False}
     intro = True
     while intro:
-        scr.fill((0, 0, 0))
+        scr.fill((255, 255, 255))
 
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -124,7 +125,7 @@ def gameintro():
                 if e.button == 1:
                     if start["mcolide"] == True:
                         intro = False
-                        cenario = cls.Cenario(scr, paoselected)
+                        cenario = cls.Cenario(scr, paoselected[select])
                     elif pao["mcolide"] == True:
                         paoselect()
 
@@ -161,7 +162,7 @@ def gameloop():
                     cenario.restart()
                 elif e.key == K_UP and cenario.p1.pulo <= 2:
                     jumpSound.play()
-                    cenario.p1.image = pygame.image.load("assets/" + paoselected + "/pao_jump.png").convert_alpha()
+                    cenario.p1.image = pygame.image.load("assets/" + paoselected[select] + "/pao_jump.png").convert_alpha()
                     cenario.p1.estado = 3
                     cenario.p1.pulo += 1
                     cenario.p1.vely = -6
@@ -179,7 +180,7 @@ def gameloop():
             elif e.type == JOYBUTTONDOWN:
                 if e.button == 0 and cenario.p1.pulo <= 2:
                     jumpSound.play()
-                    cenario.p1.image = pygame.image.load("assets/" + paoselected + "/pao_jump.png").convert_alpha()
+                    cenario.p1.image = pygame.image.load("assets/" + paoselected[select] + "/pao_jump.png").convert_alpha()
                     cenario.p1.estado = 3
                     cenario.p1.pulo += 1
                     cenario.p1.vely = -6
